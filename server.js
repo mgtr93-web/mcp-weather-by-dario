@@ -58,28 +58,31 @@ app.listen(PORT, () => {
 
 // -----------------------------
 // ENDPOINT 3: /historial.csv
-// Historial completo de lecturas en csv
+// Historial completo de lecturas en CSV
 // -----------------------------
 app.get("/historial.csv", async (req, res) => {
   try {
-    const historial = await obtenerHistorial(); // tu función que trae el JSON
+    // Usamos el mismo endpoint que ya funciona
+    const response = await fetch(URL_HISTORIAL);
+    if (!response.ok) throw new Error("Firebase no respondió correctamente");
 
-    if (!Array.isArray(historial)) {
-      return res.status(500).send("El historial no es un arreglo.");
-    }
+    const historial = await response.json();
+    if (!historial) throw new Error("Historial vacío");
+
+    // Convertir objeto en array si Firebase lo devuelve como diccionario
+    const registros = Object.values(historial);
 
     let csv = "fecha,temperatura,humedad,presion\n";
 
-    historial.forEach(item => {
-      csv += `${item.fecha},${item.temperatura},${item.humedad},${item.presion}\n`;
+    registros.forEach(item => {
+      csv += `${item.timestamp},${item.temperatura},${item.humedad},${item.presion}\n`;
     });
 
     res.setHeader("Content-Type", "text/csv");
     res.send(csv);
 
   } catch (error) {
-    console.error(error);
+    console.error("Error generando CSV:", error);
     res.status(500).send("Error generando CSV.");
   }
 });
-
