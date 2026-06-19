@@ -1,0 +1,17 @@
+{
+  "name": "mcp-weather",
+  "version": "1.0.0",
+  "description": "MCP para análisis de clima usando datos de Firebase",
+  "endpoints": {
+    "contexto": {
+      "method": "GET",
+      "path": "/contexto",
+      "description": "Devuelve los datos actuales del clima"
+    },
+    "historial": {
+      "method": "GET",
+      "path": "/historial",
+      "description": "Devuelve el historial completo de mediciones"
+    }
+  }
+}
