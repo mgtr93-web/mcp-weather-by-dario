@@ -55,3 +55,31 @@ app.get("/historial", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor MCP Weather corriendo en puerto ${PORT}`);
 });
+
+// -----------------------------
+// ENDPOINT 3: /historial.csv
+// Historial completo de lecturas en csv
+// -----------------------------
+app.get("/historial.csv", async (req, res) => {
+  try {
+    const historial = await obtenerHistorial(); // tu función que trae el JSON
+
+    if (!Array.isArray(historial)) {
+      return res.status(500).send("El historial no es un arreglo.");
+    }
+
+    let csv = "fecha,temperatura,humedad,presion\n";
+
+    historial.forEach(item => {
+      csv += `${item.fecha},${item.temperatura},${item.humedad},${item.presion}\n`;
+    });
+
+    res.setHeader("Content-Type", "text/csv");
+    res.send(csv);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error generando CSV.");
+  }
+});
+
