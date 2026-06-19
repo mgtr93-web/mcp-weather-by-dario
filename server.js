@@ -68,16 +68,20 @@ app.get("/historial.csv", async (req, res) => {
     const data = await response.json();
     if (!data) throw new Error("Historial vacío");
 
-    // Convertir el objeto de Firebase en un array
-    const registros = Object.values(data);
-
-    // Encabezado CSV
     let csv = "fecha,temperatura,humedad,presion\n";
 
-    // Generar filas
-    registros.forEach(item => {
-      csv += `${item.timestamp},${item.temperatura},${item.humedad},${item.presion}\n`;
-    });
+    // Recorrer niveles: año → mes → día → hora
+    for (const año in data) {
+      for (const mes in data[año]) {
+        for (const dia in data[año][mes]) {
+          const lecturas = data[año][mes][dia];
+          for (const hora in lecturas) {
+            const item = lecturas[hora];
+            csv += `${año}-${mes}-${dia} ${hora},${item.temperatura},${item.humedad},${item.presion}\n`;
+          }
+        }
+      }
+    }
 
     res.setHeader("Content-Type", "text/csv");
     res.send(csv);
@@ -87,4 +91,5 @@ app.get("/historial.csv", async (req, res) => {
     res.status(500).send("Error generando CSV.");
   }
 });
+
 
